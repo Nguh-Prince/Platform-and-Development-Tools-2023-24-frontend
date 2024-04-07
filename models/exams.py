@@ -6,21 +6,42 @@ from .constants import SERVER_URL
 class Exam:
     ENDPOINT = "/exams"
 
-    def __init__(self, subject=None, academic_year=None, session=None, duration=None) -> None:
+    def __init__(self, subject=None, academic_year=None, session=None, duration=None, id=None) -> None:
         self.id = id
         self.subject = subject
         self.academic_year = academic_year
         self.session = session
         self.duration = duration
+        self.files = []
 
     def save(self):
-        pass
+        url = f"{SERVER_URL}{self.ENDPOINT}"
+
+        payload = {'subject': self.subject,
+        'session': self.session,
+        'duration': self.duration,
+        'academic_year': self.academic_year}
+        files=[
+        ('files',('Nguh Prince ID recto.jpg',open('/C:/Users/Jamie/Downloads/Nguh Prince ID recto.jpg','rb'),'image/jpeg')),
+        ('files',('Nguh Prince ID verso.jpg',open('/C:/Users/Jamie/Downloads/Nguh Prince ID verso.jpg','rb'),'image/jpeg'))
+        ]
+        headers = {}
+
+        response = requests.request("POST", url, headers=headers, data=payload, files=files)
+
+        data = json.loads(response.text)
+        self.id = data['id']
 
     def read(id=None):
         url = f"{SERVER_URL}{__class__.ENDPOINT}"
         url += id if id else ''
 
-        response = json.loads(requests.get(url))
+        payload = {}
+        headers = {}
+
+        response = requests.request("GET", url, headers=headers, data=payload)
+
+        response = json.loads(response.text)
 
         if id:
             exam = __class__(**response)
