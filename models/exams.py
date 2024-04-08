@@ -4,7 +4,7 @@ import requests
 from .constants import SERVER_URL
 
 class Exam:
-    ENDPOINT = "/exams"
+    ENDPOINT = "/exams/"
 
     def __init__(self, subject=None, academic_year=None, session=None, duration=None, id=None) -> None:
         self.id = id
@@ -40,7 +40,6 @@ class Exam:
         headers = {}
 
         response = requests.request("GET", url, headers=headers, data=payload)
-
         response = json.loads(response.text)
 
         if id:
@@ -54,3 +53,17 @@ class Exam:
                 exams.append(exam)
             
             return exams
+
+    def delete(self):
+        url = f"{SERVER_URL}{self.ENDPOINT}{self.id}"
+
+        payload, headers = {}, {}
+
+        response = requests.request("DELETE", url, headers=headers, data=payload)
+
+        try:
+            response.raise_for_status()
+
+            self.id = None
+        except Exception:
+            raise exception
