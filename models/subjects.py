@@ -1,40 +1,31 @@
+import os
 import json
 import requests
 
 from .constants import SERVER_URL
 
-class Exam:
-    ENDPOINT = "/exams/"
+class Subject:
+    ENDPOINT = "/subjects/"
 
-    def __init__(self, subject=None, academic_year=None, session=None, duration=None, id=None, **kwargs) -> None:
+    def __init__(self, name, id=None) -> None:
         self.id = id
-        self.subject = subject
-        self.academic_year = academic_year
-        self.session = session
-        self.duration = duration
-        self.files = []
+        self.name = name
 
     def save(self):
         url = f"{SERVER_URL}{self.ENDPOINT}"
 
-        payload = {'subject': self.subject,
-        'session': self.session,
-        'duration': self.duration,
-        'academic_year': self.academic_year}
-        files=[
-        ('files',('Nguh Prince ID recto.jpg',open('/C:/Users/Jamie/Downloads/Nguh Prince ID recto.jpg','rb'),'image/jpeg')),
-        ('files',('Nguh Prince ID verso.jpg',open('/C:/Users/Jamie/Downloads/Nguh Prince ID verso.jpg','rb'),'image/jpeg'))
-        ]
+        payload = {'name': self.name}
         headers = {}
 
-        if not self.id:
+        if not self.id: # save to the backend with a POST request
             response = requests.request("POST", url, headers=headers, data=payload, files=files)
 
             data = json.loads(response.text)
             self.id = data['id']
-        else:
+        else: # update a particular subject
             url += str(self.id)
             response = requests.request("PATCH", url, headers=headers, data=payload, files=files)
+
 
     def read(id=None):
         url = f"{SERVER_URL}{__class__.ENDPOINT}"
