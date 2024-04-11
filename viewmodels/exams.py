@@ -1,11 +1,4 @@
-import os
-
 from models.exams import Exam
-from .files import save_file
-
-from werkzeug.utils import secure_filename
-
-from constants import UPLOAD_FOLDER
 
 def get_all_exams(return_objects=False):
     """
@@ -44,15 +37,6 @@ def save_exam(subject, academic_year, session, duration, id=None, uploaded_files
         )
 
     exam.save()
-
-    for file in uploaded_files:
-        file_name = secure_filename(file.filename)
-
-        save_file(exam=exam.id, path=file_name)
-
-        file.save(
-            os.path.join(UPLOAD_FOLDER, file_name)
-        )
 
     return exam if return_object else exam.toJSON()
     

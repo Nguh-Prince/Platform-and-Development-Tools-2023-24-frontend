@@ -1,6 +1,7 @@
 import json
 import requests
 
+from .subjects import Subject
 from .constants import SERVER_URL
 
 class Exam:
@@ -8,11 +9,15 @@ class Exam:
 
     def __init__(self, subject=None, academic_year=None, session=None, duration=None, id=None, **kwargs) -> None:
         self.id = id
-        self.subject = subject
         self.academic_year = academic_year
         self.session = session
         self.duration = duration
-        self.files = []
+        self.files = kwargs['files'] if 'files' in kwargs else []
+
+        if isinstance(subject, dict):
+            self.subject = Subject(**subject)
+        else:
+            self.subject = subject
 
     def save(self):
         url = f"{SERVER_URL}{self.ENDPOINT}"
@@ -44,7 +49,7 @@ class Exam:
         headers = {}
 
         response = requests.request("GET", url, headers=headers, data=payload)
-        response = json.loads(response.text)
+        response:dict = json.loads(response.text)
 
         if id:
             exam = __class__(**response)
@@ -71,3 +76,14 @@ class Exam:
             self.id = None
         except Exception as e:
             raise e
+        
+    def toJSON(self, with_files=True):
+        dictionary = {
+            "id": self.id,
+            "subject": self.subject,
+            "academic_year": self.academic_year,
+            "session": self.session,
+            "duration": self.duration
+        }
+
+        return dictionary
